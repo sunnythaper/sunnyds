@@ -6,14 +6,18 @@ import { formatHex, wcagContrast, rgb, xyz65, parse } from 'culori';
 
 const scaleNumbers = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000];
 const maxScaleNumber = 1000;
-const baseHue = 250;
+const baseHue = 250; // blue
+// const baseHue = 145; // green
+// const baseHue = 20; // red
+// const baseHue = 77; // yellow
 const minChroma = 0.15;
 const maxChroma = 0.85;
-const neutralScale = true;
+const neutralScale = false;
 const backgroundHex = '#FFFFFF';
 const contrastTargetMultiplier = Math.log(20.25) + 0.01155; // Added extra contrast to the multiplier to help achieve full-spectrum AA compliance
 const searchTolerance = 0.001;
 const maxSearchIterations = 30;
+const debug = true;
 
 // Functions
 
@@ -183,9 +187,11 @@ function computeColorAtScaleNumberIterative(
   }
 }
 
-console.log(`Generating scale for Hue ${baseHue} against ${backgroundHex}`);
-console.log("Scale #: Target Contrast -> Actual Contrast -> Hex Color");
-console.log("------------------------------------------------------");
+if (debug === true) {
+  console.log(`Generating scale for Hue ${baseHue} against ${backgroundHex}`);
+  console.log("Scale #: Target Contrast -> Actual Contrast -> Hex Color");
+  console.log("------------------------------------------------------");
+}
 
 const generatedScale = {};
 
@@ -205,45 +211,51 @@ for (const scaleNumber of scaleNumbers) {
 
   const actualContrast = wcagContrast(hexColor, backgroundHex) || 1;
 
-  console.log(
-      `${scaleNumber}:`.padEnd(9),
-      `${targetContrast.toFixed(2)} -> `.padEnd(10),
-      `${actualContrast.toFixed(2)} -> `.padEnd(10),
-      `${hexColor}`
-  );
+  if (debug) {
+    console.log(
+        `${scaleNumber}:`.padEnd(9),
+        `${targetContrast.toFixed(2)} -> `.padEnd(10),
+        `${actualContrast.toFixed(2)} -> `.padEnd(10),
+        `${hexColor}`
+    );
+  } else {
+    console.log(`${hexColor}`);
+  }
 
-  if (scaleNumber === 500) {
+  if (debug && scaleNumber === 500) {
       const compliant = actualContrast >= 4.5;
       console.log(`--- AA Check (500 vs Background): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${actualContrast.toFixed(2)}) ---`);
   }
 }
 
-if (generatedScale[600] && generatedScale[100]) {
-  const contrast600vs100 = wcagContrast(generatedScale[600], generatedScale[100]) || 1;
-  const compliant = contrast600vs100 >= 4.5;
-  console.log(`--- AA Check (600 vs 100): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast600vs100.toFixed(2)}) ---`);
-}
+if (debug) {
+  if (generatedScale[600] && generatedScale[100]) {
+    const contrast600vs100 = wcagContrast(generatedScale[600], generatedScale[100]) || 1;
+    const compliant = contrast600vs100 >= 4.5;
+    console.log(`--- AA Check (600 vs 100): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast600vs100.toFixed(2)}) ---`);
+  }
 
-if (generatedScale[700] && generatedScale[200]) {
-  const contrast700vs200 = wcagContrast(generatedScale[700], generatedScale[200]) || 1;
-  const compliant = contrast700vs200 >= 4.5;
-  console.log(`--- AA Check (700 vs 200): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast700vs200.toFixed(2)}) ---`);
-}
+  if (generatedScale[700] && generatedScale[200]) {
+    const contrast700vs200 = wcagContrast(generatedScale[700], generatedScale[200]) || 1;
+    const compliant = contrast700vs200 >= 4.5;
+    console.log(`--- AA Check (700 vs 200): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast700vs200.toFixed(2)}) ---`);
+  }
 
-if (generatedScale[800] && generatedScale[300]) {
-  const contrast800vs300 = wcagContrast(generatedScale[800], generatedScale[300]) || 1;
-  const compliant = contrast800vs300 >= 4.5;
-  console.log(`--- AA Check (800 vs 300): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast800vs300.toFixed(2)}) ---`);
-}
+  if (generatedScale[800] && generatedScale[300]) {
+    const contrast800vs300 = wcagContrast(generatedScale[800], generatedScale[300]) || 1;
+    const compliant = contrast800vs300 >= 4.5;
+    console.log(`--- AA Check (800 vs 300): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast800vs300.toFixed(2)}) ---`);
+  }
 
-if (generatedScale[900] && generatedScale[400]) {
-  const contrast900vs400 = wcagContrast(generatedScale[900], generatedScale[400]) || 1;
-  const compliant = contrast900vs400 >= 4.5;
-  console.log(`--- AA Check (900 vs 400): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast900vs400.toFixed(2)}) ---`);
-}
+  if (generatedScale[900] && generatedScale[400]) {
+    const contrast900vs400 = wcagContrast(generatedScale[900], generatedScale[400]) || 1;
+    const compliant = contrast900vs400 >= 4.5;
+    console.log(`--- AA Check (900 vs 400): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast900vs400.toFixed(2)}) ---`);
+  }
 
-if (generatedScale[1000] && generatedScale[500]) {
-  const contrast1000vs500 = wcagContrast(generatedScale[1000], generatedScale[500]) || 1;
-  const compliant = contrast1000vs500 >= 4.5;
-  console.log(`--- AA Check (1000 vs 500): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast1000vs500.toFixed(2)}) ---`);
+  if (generatedScale[1000] && generatedScale[500]) {
+    const contrast1000vs500 = wcagContrast(generatedScale[1000], generatedScale[500]) || 1;
+    const compliant = contrast1000vs500 >= 4.5;
+    console.log(`--- AA Check (1000 vs 500): ${compliant ? 'PASS' : 'FAIL'} (Contrast: ${contrast1000vs500.toFixed(2)}) ---`);
+  }
 }
