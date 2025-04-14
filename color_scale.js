@@ -1,34 +1,48 @@
 // Imports
+
 import { formatHex, wcagContrast, rgb, xyz65, parse } from 'culori';
 
 // Variables
+
 const scaleNumbers = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000];
 const maxScaleNumber = 1000;
 const baseHue = 250;
 const minChroma = 0.15;
 const maxChroma = 0.85;
+const neutralScale = true;
 const backgroundHex = '#FFFFFF';
 const contrastTargetMultiplier = Math.log(20.25) + 0.01155; // Added extra contrast to the multiplier to help achieve full-spectrum AA compliance
 const searchTolerance = 0.001;
 const maxSearchIterations = 30;
 
 // Functions
+
 function normalizeScaleNumber(scaleNumber, maxScaleNumber) {
   return scaleNumber / maxScaleNumber;
 }
 
-function computeScaleHue(scaleValue, baseHue) {
-  return baseHue + 5 * (1 - scaleValue);
+function computeScaleHue(scaleValue, baseHue, neutralScale) {
+  if (neutralScale == true) {
+    return baseHue;
+  } else {
+    return baseHue + 5 * (1 - scaleValue);
+  }
 }
 
 function computeScaleChroma(scaleValue, minChroma, maxChroma) {
   const chromaDifference = maxChroma - minChroma;
-  const chroma = -4 * chromaDifference * Math.pow(scaleValue - 0.5, 2) + maxChroma;
-  // return Math.max(minChroma, chroma);
+
+  let chromaMuliplier;
+
+  if (neutralScale == true) {
+    chromaMuliplier = 0.8;
+  } else {
+    chromaMuliplier = 4
+  }
 
   return (
-    -4 * chromaDifference * Math.pow(scaleValue, 2) +
-    4 * chromaDifference * scaleValue +
+    -chromaMuliplier * chromaDifference * Math.pow(scaleValue, 2) +
+    chromaMuliplier * chromaDifference * scaleValue +
     minChroma
   );
 }
@@ -141,7 +155,7 @@ function computeColorAtScaleNumberIterative(
   backgroundHex
 ) {
   const scaleValue = normalizeScaleNumber(scaleNumber, maxScaleNumber);
-  const targetHue = computeScaleHue(scaleValue, baseHue);
+  const targetHue = computeScaleHue(scaleValue, baseHue, neutralScale);
   const targetSat = computeScaleChroma(scaleValue, minChroma, maxChroma);
   const targetContrast = scaleValue <= 0 ? 1 : Math.exp(contrastTargetMultiplier * scaleValue);
   const backgroundParsed = parse(backgroundHex);
