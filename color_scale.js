@@ -6,17 +6,19 @@ import { formatHex, wcagContrast, rgb, xyz65, parse } from 'culori';
 
 const scaleNumbers = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000];
 const maxScaleNumber = 1000;
-const baseHue = 250; // blue
+const baseHue = 320; // purple
+// const baseHue = 250; // blue
 // const baseHue = 145; // green
-// const baseHue = 20; // red
 // const baseHue = 77; // yellow
+// const baseHue = 55; // orange
+// const baseHue = 20; // red
 const minChroma = 0.15;
 const maxChroma = 0.85;
-const neutralScale = false;
 const backgroundHex = '#FFFFFF';
 const contrastTargetMultiplier = Math.log(20.25) + 0.01155; // Added extra contrast to the multiplier to help achieve full-spectrum AA compliance
 const searchTolerance = 0.001;
 const maxSearchIterations = 30;
+const neutralScale = false;
 const debug = true;
 
 // Functions
